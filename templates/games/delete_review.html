@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Удаление отзыва - GameTester{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 60px auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); text-align: center;">
+
+    <div style="font-size: 3em; margin-bottom: 20px;">🗑️</div>
+
+    <h2 style="color: #24292e; margin-bottom: 15px;">Удалить отзыв?</h2>
+    <p style="color: #666; margin-bottom: 30px;">
+        Вы уверены, что хотите безвозвратно удалить этот отзыв к игре <b>"{{ review.game.title }}"</b>?
+    </p>
+
+    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 30px; text-align: left;">
+        <p style="font-style: italic; color: #444; margin: 0;">"{{ review.text|truncatechars:100 }}"</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: flex; gap: 15px;">
+            <button type="submit" class="btn btn-danger" style="flex: 1; padding: 12px; background: #dc3545; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                Да, удалить
+            </button>
+            <a href="{% url 'game_detail' review.game.pk %}" class="btn-cancel" style="flex: 1; padding: 12px; text-decoration: none; color: #6c757d; border: 1px solid #ccc; border-radius: 8px; font-weight: bold;">
+                Отмена
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .btn-danger:hover {
+        background: #c82333 !important;
+    }
+
+    .btn-cancel:hover {
+        background: #f8f9fa;
+        color: #333;
+    }
+</style>
+{% endblock %}

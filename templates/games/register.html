@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация - GameTester{% endblock %}
+
+{% block content %}
+<div style="max-width: 450px; margin: 40px auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+
+    <div style="text-align: center; margin-bottom: 30px;">
+        <h2 style="color: #24292e; margin-bottom: 10px;">Создать аккаунт</h2>
+        <p style="color: #666; font-size: 0.95em;">Присоединяйтесь к сообществу тестеров и разработчиков</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 500; color: #333;">
+                    {{ field.label }}
+                </label>
+
+                {# Рендерим само поле ввода #}
+                <div class="form-input-wrapper">
+                    {{ field }}
+                </div>
+
+                {% if field.help_text %}
+                    <small style="display: block; color: #888; margin-top: 5px; font-size: 0.8em; line-height: 1.2;">
+                        {{ field.help_text }}
+                    </small>
+                {% endif %}
+
+                {% for error in field.errors %}
+                    <p style="color: #dc3545; font-size: 0.85em; margin-top: 5px; font-weight: bold;">
+                        {{ error }}
+                    </p>
+                {% endfor %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1em; background: #28a745; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: bold; transition: background 0.3s;">
+            Зарегистрироваться
+        </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
+        <p style="color: #666;">
+            Уже есть аккаунт? <a href="{% url 'login' %}" style="color: #007bff; text-decoration: none; font-weight: 500;">Войти здесь</a>
+        </p>
+    </div>
+</div>
+
+<style>
+    /* Стилизация полей, которые генерирует Django (username, password и т.д.) */
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 1em;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .btn-primary:hover {
+        background: #218838 !important; /* Немного темнее при наведении */
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,8 @@
+# Игнорировать базу данных и кэш
+db.sqlite3
+__pycache__/
+*.pyc
+.env
+venv/
+media/
+.DS_Store

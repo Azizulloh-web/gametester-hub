@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Профиль {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+    <div style="border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px;">
+        <h1>Профиль пользователя: {{ profile_user.username }}</h1>
+        <p>На сайте с: {{ profile_user.date_joined|date:"d.m.Y" }}</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+        <!-- Секция игр -->
+        <div>
+            <h3>🚀 Опубликованные игры ({{ user_games.count }})</h3>
+            {% for game in user_games %}
+                <div style="background: #f9f9f9; padding: 10px; margin-bottom: 10px; border-radius: 5px;">
+                    <a href="{% url 'game_detail' pk=game.pk %}"><b>{{ game.title }}</b></a>
+                    <br><small>Рейтинг: {{ game.get_average_rating }}</small>
+                </div>
+            {% empty %}
+                <p>Этот пользователь еще не добавил ни одной игры.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Секция отзывов -->
+        <div>
+            <h3>✍️ Оставленные отзывы ({{ user_reviews.count }})</h3>
+            {% for review in user_reviews %}
+                <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
+                    <p>К игре: <a href="{% url 'game_detail' pk=review.game.pk %}">{{ review.game.title }}</a></p>
+                    <span style="color: #f39c12;">Оценка: {{ review.rating }}/5</span>
+                    <p><i>"{{ review.text|truncatechars:50 }}"</i></p>
+                </div>
+            {% empty %}
+                <p>Отзывов пока нет.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

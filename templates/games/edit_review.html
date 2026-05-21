@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование отзыва - GameTester{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 50px auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+
+    <div style="margin-bottom: 30px; text-align: center;">
+        <h2 style="color: #24292e; margin-bottom: 10px;">Редактировать отзыв</h2>
+        <p style="color: #666;">Вы можете изменить свою оценку и текст отзыва ниже.</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: bold; color: #333;">
+                    {{ field.label }}
+                </label>
+
+                {# Рендерим поле ввода (стили возьмутся из виджетов в forms.py) #}
+                <div class="form-field-wrapper">
+                    {{ field }}
+                </div>
+
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <p style="color: #dc3545; font-size: 0.85em; margin-top: 5px;">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div style="display: flex; gap: 15px; margin-top: 30px;">
+            <button type="submit" class="btn btn-primary" style="flex: 2; padding: 12px; font-weight: bold; background: #007bff; border: none; border-radius: 8px; color: white; cursor: pointer;">
+                Сохранить изменения
+            </button>
+
+            <a href="javascript:history.back()" class="btn-cancel" style="flex: 1; padding: 12px; text-align: center; text-decoration: none; color: #6c757d; border: 1px solid #ccc; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: center;">
+                Отмена
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Стили для полей ввода (если они не прописаны в forms.py) */
+    select, textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1em;
+        font-family: inherit;
+        box-sizing: border-box;
+    }
+
+    textarea:focus, select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+    }
+
+    .btn-primary:hover {
+        background: #0056b3 !important;
+    }
+
+    .btn-cancel:hover {
+        background: #f8f9fa;
+        color: #333;
+    }
+</style>
+{% endblock %}

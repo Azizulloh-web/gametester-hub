@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ game.title }} - Детали игры{% endblock %}
+
+{% block content %}
+<div style="display: flex; gap: 30px; align-items: flex-start;">
+    {% if game.cover_image %}
+    <img src="{{ game.cover_image.url }}"
+         style="width: 300px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+    {% endif %}
+    {% if game.screenshots.all %}
+    <h3 style="margin-top: 30px;">Скриншоты геймплея:</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+        {% for screen in game.screenshots.all %}
+        <a href="{{ screen.image.url }}" target="_blank">
+            <img src="{{ screen.image.url }}"
+                 style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;">
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div style="margin: 20px 0; display: flex; align-items: center; gap: 15px;">
+        <form action="{% url 'like_game' pk=game.pk %}" method="POST">
+            {% csrf_token %}
+            {% if user.is_authenticated %}
+            <button type="submit" class="btn"
+                    style="background: {% if user in game.likes.all %}#ff4d4d{% else %}#ccc{% endif %}; color: white;">
+                ❤️ Лайк ({{ game.total_likes }})
+            </button>
+            {% else %}
+            <span style="color: #666;">❤️ Лайков: {{ game.total_likes }}</span>
+            {% endif %}
+        </form>
+    </div>
+    <div>
+        <h1>{{ game.title }}</h1>
+        <p style="color: #666;">Разработчик: <b>{{ game.developer.username }}</b></p>
+        <p style="font-size: 1.2em; color: #f39c12;">⭐ Средний рейтинг: {{ game.get_average_rating }}</p>
+
+        <div style="margin: 20px 0;">
+            <h3>Описание:</h3>
+            <p>{{ game.description }}</p>
+        </div>
+
+        {% if game.game_url %}
+        <a href="{{ game.game_url }}" class="btn btn-success" target="_blank">🎮 Играть / Скачать</a>
+        {% endif %}
+        {% if user == game.developer %}
+        <div style="margin: 10px 0; display: flex; gap: 10px;">
+            <a href="{% url 'edit_game' pk=game.pk %}" class="btn"
+               style="background: #ffc107; color: #000; font-size: 0.8em;">✏️ Редактировать</a>
+            <a href="{% url 'delete_game' pk=game.pk %}" class="btn"
+               style="background: #dc3545; color: #fff; font-size: 0.8em;">🗑️ Удалить проект</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee;">
+
+<h3>Отзывы тестеров</h3>
+{% if user.is_authenticated %}
+{% if not user_reviewed %}
+<div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+    <h4>Оставить свой отзыв:</h4>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Отправить отзыв</button>
+    </form>
+</div>
+
+    {% else %}
+   <div style="padding: 15px; background: #e7f3ff; color: #004085; border-radius: 8px; margin-bottom: 30px; text-align: center;">
+        ✅ Вы уже оставили отзыв на эту игру. Спасибо за помощь в тестировании!
+    </div>
+    {% endif %}
+
+{% endif %}
+<div class="reviews-list">
+    {% for review in reviews %}
+    {% for review in game.reviews.all %}
+        <div style="border-left: 4px solid #007bff; padding: 15px; background: white; margin-bottom: 20px; border-radius: 0 8px 8px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong>@{{ review.author.username }}</strong>
+                <span style="color: #ff9800; font-weight: bold;">Оценка: {{ review.rating }}/5</span>
+            </div>
+
+            <p style="margin: 10px 0; color: #444; line-height: 1.5;">{{ review.text }}</p>
+
+            <small style="color: #999; display: block; margin-bottom: 10px;">{{ review.created_at|date:"d.m.Y H:i" }}</small>
+
+            {% if request.user == review.author %}
+                <div style="display: flex; gap: 10px; border-top: 1px solid #eee; padding-top: 10px;">
+                    <a href="{% url 'edit_review' review.pk %}"
+                       style="text-decoration: none; padding: 6px 12px; background: #ffc107; color: #000; border-radius: 5px; font-size: 0.85em; font-weight: bold; transition: 0.3s;">
+                       ✏️ Редактировать
+                    </a>
+                    <a href="{% url 'delete_review' review.pk %}"
+                       style="text-decoration: none; padding: 6px 12px; background: #dc3545; color: white; border-radius: 5px; font-size: 0.85em; font-weight: bold; transition: 0.3s;">
+                       🗑️ Удалить
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+
+
+{% empty %}
+<p style="color: #666; font-style: italic;">Отзывов пока нет. Будьте первым!</p>
+{% endfor %}
+
+<br>
+<a href="{% url 'game_list' %}">← Вернуться к списку</a>
+{% endblock %}

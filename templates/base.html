@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}GameTester Hub{% endblock %}</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #f0f2f5; }
+        nav { background: #24292e; color: white; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; }
+        nav a { color: white; text-decoration: none; margin-left: 15px; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 20px; background: white; border-radius: 10px; shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn { padding: 8px 16px; border-radius: 5px; cursor: pointer; border: none; text-decoration: none; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .game-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; }
+        .game-card img { width: 150px; height: 100px; object-fit: cover; border-radius: 5px; }
+    </style>
+</head>
+<body>
+<nav>
+
+    <a href="{% url 'game_list' %}" style="font-size: 1.5em; font-weight: bold; margin-left: 0;">🎮 GameTester</a>
+
+    <form action="{% url 'game_list' %}" method="get" style="display: flex; gap: 5px;">
+        <input type="text" name="search" placeholder="Поиск игр..."
+               value="{{ request.GET.search }}"
+               style="padding: 5px 10px; border-radius: 4px; border: none;">
+        <button type="submit" class="btn btn-primary" style="padding: 5px 10px;">Найти</button>
+        <a href="{% url 'add_game' %}" class="btn btn-success" style="margin-left: 10px;">Добавить</a>
+    </form>
+
+    <div>
+        {% if user.is_authenticated %}
+        <span>Привет,
+        <a href="{% url 'profile' username=user.username %}" style="color: #007bff; font-weight: bold;">
+            {{ user.username }}
+        </a>
+    </span>
+        <form action="{% url 'logout' %}" method="post" style="display: inline; margin-left: 15px;">
+        {% csrf_token %}
+        <button type="submit" style="background: none; border: none; color: #ff4d4d; cursor: pointer; font-family: inherit; font-size: inherit;">
+            Выйти
+        </button>
+    </form>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="container">
+    {% block content %}
+    {% endblock %}
+</div>
+</body>
+</html>

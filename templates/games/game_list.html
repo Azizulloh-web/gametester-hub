@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - GameTester Hub{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h1>Игры на проверку</h1>
+    <span style="color: #666;">Всего проектов: {{ page_obj.paginator.count }}</span>
+</div>
+{% if top_games %}
+<h2 style="color: #f39c12;">🔥 Популярные проекты</h2>
+<div style="display: flex; gap: 15px; margin-bottom: 30px;">
+    {% for top in top_games %}
+    <div style="flex: 1; padding: 10px; border: 2px solid #f39c12; border-radius: 8px; background: #fff;">
+        <a href="{% url 'game_detail' pk=top.pk %}" style="text-decoration: none; color: black; font-weight: bold;">
+            {{ top.title }}
+        </a>
+        <br><small>❤️ Лайков: {{ top.total_likes }}</small>
+    </div>
+    {% endfor %}
+</div>
+<hr>
+{% endif %}
+<div style="background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #eee;">
+    <!-- Жанры -->
+    <div style="margin-bottom: 10px;">
+        <strong>Жанры:</strong>
+        <!-- Кнопка "Все" просто сбрасывает категорию, но сохраняет статус -->
+        <a href="?{% if current_status %}status={{ current_status }}{% endif %}"
+           style="margin: 0 10px; text-decoration: none; {% if not current_category %}font-weight: bold; color: #007bff;{% endif %}">Все</a>
+
+        {% for cat in categories %}
+        <a href="?category={{ cat.slug }}{% if current_status %}&status={{ current_status }}{% endif %}"
+           style="margin-right: 10px; text-decoration: none; color: #333; {% if current_category == cat.slug %}font-weight: bold; color: #007bff; border-bottom: 2px solid #007bff;{% endif %}">
+            {{ cat.name }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Статусы -->
+    <div>
+        <strong>Статус:</strong>
+        <a href="?{% if current_category %}category={{ current_category }}{% endif %}"
+           style="margin: 0 10px; text-decoration: none; {% if not current_status %}font-weight: bold; color: #007bff;{% endif %}">Все</a>
+
+        {% for val, name in status_choices %}
+        <a href="?status={{ val }}{% if current_category %}&category={{ current_category }}{% endif %}"
+           style="margin-right: 10px; text-decoration: none; color: #333; {% if current_status == val %}font-weight: bold; color: #007bff; border-bottom: 2px solid #007bff;{% endif %}">
+            {{ name }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% if request.GET.search %}
+<h3>Результаты поиска по запросу "{{ request.GET.search }}":</h3>
+{% endif %}
+
+<!-- Сетка для карточек игр -->
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;">
+    {% for game in page_obj %}
+    <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.2s;"
+         onmouseover="this.style.transform='translateY(-5px)'"
+         onmouseout="this.style.transform='translateY(0)'">
+
+        <!-- Обложка игры -->
+        <div style="height: 180px; background: #ddd; overflow: hidden;">
+            {% if game.cover_image %}
+            <img src="{{ game.cover_image.url }}" style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;">
+                🖼️ Нет обложки
+            </div>
+            {% endif %}
+        </div>
+        <!-- Контент карточки -->
+        <div style="padding: 20px;">
+            <h2 style="margin: 0 0 10px 0; font-size: 1.4em;">
+                <a href="{% url 'game_detail' pk=game.pk %}" style="text-decoration: none; color: #24292e;">
+                    {{ game.title }}
+                </a>
+                <span style="background: {{ game.get_status_color }}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; text-transform: uppercase; font-weight: bold;">
+                {{ game.get_display_status_attribute }}
+                {# Метод get_display_status_attribute в Django автоматически выводит понятное название из choices #}
+                {{ game.get_status_display }}
+            </span>
+            </h2>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <span style="font-size: 0.9em; color: #666;">👤 {{ game.developer.username }}</span>
+                <span style="font-weight: bold; color: #f39c12;">⭐ {{ game.get_average_rating }}</span>
+            </div>
+
+            <p style="color: #555; font-size: 0.95em; line-height: 1.4; height: 4em; overflow: hidden; text-overflow: ellipsis;">
+                {{ game.description|truncatechars:100 }}
+            </p>
+
+            <a href="{% url 'game_detail' pk=game.pk %}" class="btn btn-primary"
+               style="display: block; text-align: center; margin-top: 15px;">
+                Смотреть детали
+            </a>
+        </div>
+    </div>
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 50px;">
+        <h3>Игр пока нет... 😢</h3>
+        <p>Станьте первым, кто <a href="{% url 'add_game' %}">опубликует свою игру</a>!</p>
+    </div>
+    {% endfor %}
+</div>
+<div style="margin-top: 40px; text-align: center;">
+    <span style="color: #666;">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    <div style="margin-top: 10px;">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+           class="btn btn-primary">⬅ Назад</a>
+        {% endif %}
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+           class="btn btn-primary">Вперед ➡</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
