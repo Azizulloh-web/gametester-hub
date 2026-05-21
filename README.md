@@ -30,12 +30,6 @@ cd gametester-hub
 Создайте виртуальное окружение и установите зависимости:
 
 Bash
-python -m venv venv
-source venv/bin/activate  # Для Windows: venv\Scripts\activate
-pip install -r requirements.txt
-Примените миграции базы данных:
-
-Bash
 python manage.py migrate
 Запустите сервер:
 
